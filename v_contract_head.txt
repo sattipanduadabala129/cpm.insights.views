@@ -1,0 +1,42 @@
+CREATE OR REPLACE VIEW v_contract_head AS
+select
+ch.partner_id "contract_head_partner_id",
+ch.id as "contract_head_id",
+ch.customer_id as "contract_head_customer_id",
+ch.contract_type_id as "contract_head_contract_type_id",
+ch.contract_number as "Contract number",
+ch.contract_name as "Contract name",
+c.customer_number  as "Customer number",
+c."name" as "Customer name",
+ct.name as "Contract type",
+ch.quote_date as "Quote date",
+ch.quote_number as "Quote number",
+ch.status as "Contract status",
+ch.total_cost as "Cost (imported)",
+ch.list_price as "List price",
+(ch.list_price - ch.total_cost) as "List profit",
+case
+	when ch.list_price = 0
+	then 0
+	else ((ch.list_price - ch.total_cost) / ch.list_price)
+end as "List margin",
+(ch.list_price - ch.net_price ) as "Discount",
+case
+	when ch.list_price = 0
+	then 0
+	else ((ch.list_price - ch.net_price ) / ch.list_price) 
+end as "Discount %",
+ch.net_price as "Net price",
+(ch.net_price - ch.total_cost) as "Net profit",
+case
+	when ch.net_price = 0
+	then 0
+	else ((ch.net_price - ch.total_cost) / ch.net_price)
+end as "Net margin",
+ch.renewed as "Renewal contract",
+ch.renewal_planned as "Renewal planned",
+ch.valid_from_time as "Valid from",
+ch.valid_to_time as "Valid to"
+from public.contract_head ch
+left join contract_type ct on ct.id = ch.contract_type_id 
+left join customer c on c.id =ch.customer_id

@@ -1,0 +1,74 @@
+CREATE OR REPLACE VIEW v_work_order AS
+select
+wo.partner_id "work_order_partner_id",
+wo.id as "work_order_id",
+wo.asset_id as "work_order_asset_id",
+wo.product_id as "work_order_product_id",
+wo.customer_id as "work_order_customer_id",
+wo.service_provider_id as "work_order_service_provider_id",
+wo.type_id as "work_order_type_id",
+wo.contract_head_id as "work_order_contract_head_id",
+wo.work_order_number as "Work order number",
+a.serial_number as "Serial number",
+wo.status as "Status",
+p.product_number as "Product number",
+wo.production_time as "Product production date",
+wo.installation_time as "Product installation date",
+wo.creation_date as "Created on",
+wo.start_date as "Start date",
+wo.end_date as "End date",
+wo.country_code as "Country",
+c.customer_number as "Customer number",
+c.name as "Customer name",
+wo.location_number as "Location number",
+cl.name as "Location name",
+sp.provider_number as "Service provider number",
+wot.code as "Work order type",
+wot.description as "Work order type name",
+e.code as "Entitlement Code",
+e.description as "Entitlement Description",
+case 
+	when wo.usage_value is null
+	then ''
+	else concat(wo.usage_value,' ', uom.description)
+end as "Usage",
+wo.customer_complaint as "Customer complaint",
+wo.problem_found as "Problem found",
+ch.contract_number  as "Contract Number",
+wo.work_performed as "Work performed",
+case 
+	when wo.labor_time is null
+	then ''
+	else concat(wo.labor_time,' ',uom1.description )
+end as "Labor time",
+case 
+	when wo.travel_time is null
+	then ''
+	else concat(wo.travel_time,' ',uom2.description )
+end as "Travel time",
+(wo.labor_time + wo.travel_time) as "Total time",
+wo.labor_cost as "Labor cost",
+wo.parts_cost as "Parts cost",
+wo.travel_cost as "Travel cost",
+(wo.labor_cost + wo.parts_cost + wo.travel_cost) as "Total cost",
+wo.fixed_labor_cost as "Fixed labor cost",
+wo.fixed_travel_cost as "Fixed travel cost",
+wo.pm_travel_cost as "PM Travel cost",
+wo.pm_fixed_travel_cost as "PM Fixed travel cost",
+wo.pm_labor_cost as "PM Labor cost",
+wo.pm_fixed_labor_cost as "PM Fixed labor cost",
+wo.pm_parts_cost as "PM Parts cost",
+curr.code as "Currency"
+from work_order wo
+left join work_order_type wot on wot.id= wo.type_id
+left join contract_head ch on ch.id = wo.contract_head_id 
+left join asset a on a.id = wo.asset_id 
+left join product p on p.id = wo.product_id 
+left join customer c on c.id = wo.customer_id 
+left join customer_location cl on cl.location_number = wo.location_number 
+left join service_provider sp on sp.id = wo.service_provider_id 
+left join entitlement e on e.id = wo.entitlement_id 
+left join unit_of_measure uom on uom.id = wo.usage_unit_id
+left join unit_of_measure uom1 on uom1.id = wo.labor_time_unit_id 
+left join unit_of_measure uom2 on uom2.id = wo.travel_time_unit_id  
+left join currency curr on curr.id = wo.currency_id 

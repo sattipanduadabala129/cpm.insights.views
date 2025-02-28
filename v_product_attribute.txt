@@ -1,0 +1,9 @@
+CREATE OR REPLACE  VIEW v_product_attribute AS
+SELECT 
+    p.id AS product_id, 
+    p.partner_id,
+    ca."name" AS "Attribute name",
+    kv.value AS "Attribute value"
+FROM product p
+LEFT JOIN LATERAL jsonb_each_text(p.custom_attributes) kv ON true
+LEFT JOIN custom_attribute ca ON ca.id::TEXT = kv.key;
