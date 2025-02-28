@@ -1,0 +1,46 @@
+create or replace view v_contract_line 
+as select 
+cl.id as "contract_line_id",
+ch.id as "contract_head_id",
+cl.partner_id as "contract_line_partner_id",
+cl.product_id as "contract_line_product_id",
+cl.service_provider_id as "contract_line_service_provider_id",
+cl.asset_id as "contract_line_asset_id",
+cl.customer_location_id as "contract_line_customer_location_id",
+cl.line_number  as "Contract line Number",
+sp.provider_number  as "Contract line Service provider number",
+sp."name" as "Contract line Service provider name",
+clc."name"  as "Contract line location name",
+clc.country as "Contract line country",
+p.product_number  as "Product number",
+a.serial_number  as "Product serial number",
+cl.unit_cost as "Line cost",
+cl.unit_list_price as "Line list price",
+(cl.unit_list_price -  cl.unit_cost) as "Line list profit",
+case
+	when cl.unit_list_price = 0
+	then 0
+	else ((cl.unit_list_price -  cl.unit_cost) / cl.unit_list_price )
+end as "Line list margin",
+cl.unit_net_price as "Line net price",
+-(cl.unit_list_price - cl.unit_net_price) as "Line discount",
+case 
+	when cl.unit_list_price = 0
+	then 0
+	else ((cl.unit_list_price - cl.unit_net_price) / cl.unit_list_price)
+end as "Line discount%",
+(cl.unit_net_price - cl.unit_cost) as "Line net profit",
+case 
+	when cl.unit_net_price = 0
+	then 0
+	else ((cl.unit_net_price - cl.unit_cost) / cl.unit_net_price )
+end as "Line net margin" 
+FROM contract_line cl
+LEFT JOIN LATERAL (
+    SELECT ch.id, unnest(ch.contract_line_ids) AS contract_line_id
+    FROM contract_head ch
+) AS ch ON cl.id = ch.contract_line_id
+left join asset a on a.id =cl.asset_id 
+left join product p on p.id =cl.product_id 
+left join service_provider sp on sp.id =cl.service_provider_id
+left join customer_location clc  on clc.id  =cl.customer_location_id

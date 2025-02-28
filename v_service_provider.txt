@@ -1,0 +1,16 @@
+CREATE OR REPLACE VIEW v_service_provider AS
+select
+sp.partner_id "service_provider_partner_id",
+sp.id as "service_provider_id",
+spl.partner_id "service_provider_location_partner_id",
+spl.id as "service_provider_location_id",
+sp.provider_number as "Service provider number",
+sp.name as "Service provider name",
+spl.location_number as "Location number",
+spl.name as "Location name",
+spl.city as "City",
+spl.state  as "State",
+spl.country as "Country"
+from public.service_provider sp
+left join lateral unnest(sp.location_ids) AS location_id on TRUE
+left JOIN public.service_provider_location spl ON spl.id = location_id

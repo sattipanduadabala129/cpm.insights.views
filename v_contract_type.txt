@@ -1,0 +1,16 @@
+CREATE OR REPLACE VIEW v_contract_type AS
+select
+ct.id as "contract_type_id",
+ct.partner_id as "contract_type_partner_id",
+ct.service_package_id as "contract_type_service_package_id",
+contract_type_coverage_id as "contract_type_coverage_id",
+ct.code as "Contract type code",
+ct.name as "Contract type name",
+ct.contract_group as "Contract type group",
+sp."name" as "Contract type service package",
+ctc.name as "Coverage",
+ct.is_active as "Active"
+from public.contract_type ct
+Left join lateral unnest(ct.contract_type_coverage_ids) AS contract_type_coverage_id on true
+left join contract_type_coverage ctc on ctc.id = contract_type_coverage_id
+left join service_package sp on sp.id =ct.service_package_id 

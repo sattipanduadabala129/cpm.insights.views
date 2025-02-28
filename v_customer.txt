@@ -1,0 +1,16 @@
+CREATE OR REPLACE VIEW v_customer AS
+select
+c.partner_id "customer_partner_id",
+c.id as "customer_id",
+c.customer_number  as "Customer number",
+c.name as "Customer name",
+cg.description  as "Customer Group",
+cl.location_number as "Location number" ,
+cl.name as "Location name",
+cl.city as "City",
+cl.state as "State",
+cl.country as "Country"
+from public.customer c 
+left join lateral unnest(c.location_ids) AS location_id on true
+left join customer_group cg on cg.id =c.customer_group_id
+left JOIN customer_location cl ON cl.id = location_id

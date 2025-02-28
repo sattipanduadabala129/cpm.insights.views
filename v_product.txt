@@ -1,0 +1,17 @@
+CREATE OR REPLACE  VIEW v_product AS
+select
+p.id  as "product_id",
+p.partner_id as "product_partner_id",
+a.id as "asset_id",
+product_brand_id as "product_brand_id",
+pt."name"  as "Product Type",
+pb."name" as "Brand",
+p.product_number as "Product number",
+p.name as "Product name",
+p.year_of_launch as "Year of launch",
+a.serial_number as "Asset serial number"
+from public.product p 
+left join lateral unnest(p.product_brand_ids) AS product_brand_id on TRUE
+left join product_brand pb ON pb.id = product_brand_id 
+left join product_type pt on pt.id =p.product_type_id
+left join asset a on a.product_id =p.id 
